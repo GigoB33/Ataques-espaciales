@@ -1,4 +1,4 @@
-name: Compilar APK
+name: Construir Juego Web
 
 on:
   push:
@@ -6,29 +6,28 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-22.04
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Configurar Python
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
-          
-      - name: Instalar herramientas del sistema y Buildozer
-        run: |
-          sudo apt update
-          sudo apt install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
-          pip install --upgrade pip
-          pip install buildozer Cython==0.29.33 virtualenv
-          
-      - name: Compilar juego (¡Sin restricciones!)
-        run: buildozer -v android debug
-        
-      - name: Guardar APK
-        uses: actions/upload-artifact@v4
+          python-version: '3.11'
+
+      - name: Instalar Pygbag
+        run: pip install pygbag
+
+      - name: Compilar el juego
+        run: pygbag --build .
+
+      - name: Publicar en Internet
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          name: mi-juego-apk
-          path: bin/*.apk
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web
 
