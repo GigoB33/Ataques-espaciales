@@ -7,9 +7,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Instalar Cython (El traductor faltante)
+        run: pip3 install Cython==0.29.33 virtualenv
       
       - name: Build APK
         uses: digreatbrian/buildozer-action@v2
